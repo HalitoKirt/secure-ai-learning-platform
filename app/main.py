@@ -1,6 +1,8 @@
+import ollama
+
 def main():
     print("Secure AI Learning Platform")
-    print("Phase 1: Basic local application is running.")
+    print("Local LLM connected (Ollama)")
 
     while True:
         user_input = input("\nAsk a question or type 'exit': ")
@@ -9,8 +11,13 @@ def main():
             print("Goodbye.")
             break
 
-        print(f"\nYou asked: {user_input}")
-        print("AI response will be added in the next phase.")
+        response = ollama.chat(
+            model="llama3.2:3b",
+            messages=[{"role": "user", "content": user_input}]
+        )
+
+        print("\nAI Response:")
+        print(response["message"]["content"])
 
 
 if __name__ == "__main__":
