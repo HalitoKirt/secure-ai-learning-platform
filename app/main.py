@@ -1,3 +1,5 @@
+from app.agents.security_agent import run_security_agent
+from app.telemetry import log_event
 from app.rag.rag import load_documents, query_docs
 from app.agents.tutor_agent import run_tutor_agent
 from app.agents.quiz_agent import run_quiz_agent, parse_quiz_output
@@ -6,7 +8,7 @@ from app.agents.evaluator_agent import run_evaluator_agent
 
 def main():
     print("Secure AI Learning Platform")
-    print("RAG + Tutor Agent + Interactive Quiz + Evaluator Agent enabled")
+    print("RAG + Tutor + Quiz + Evaluator + Telemetry enabled")
 
     load_documents()
 
@@ -21,6 +23,9 @@ def main():
             print("Please choose 'tutor', 'quiz', 'evaluate', or 'exit'.")
             continue
 
+        # -------------------------
+        # MANUAL EVALUATE MODE
+        # -------------------------
         if mode == "evaluate":
             question = input("Question: ")
             expected_answer = input("Expected answer: ")
@@ -30,18 +35,52 @@ def main():
 
             print("\nEvaluator Agent Feedback:")
             print(feedback)
+
+            # ✅ TELEMETRY HERE
+            log_event("manual_evaluation", {
+                "question": question,
+                "user_answer": user_answer,
+            })
+
             continue
 
+        # -------------------------
+        # COMMON INPUT (tutor/quiz)
+        # -------------------------
         user_input = input("Enter your topic or question: ")
 
         docs = query_docs(user_input)
         context = "\n".join(docs)
 
+        security_review = run_security_agent(user_input, context)
+
+        print("\nSecurity Agent Review:")
+        print(security_review)
+
+        log_event("security_review", {
+            "mode": mode,
+            "input": user_input,
+            "review": security_review,
+        })
+
+        # -------------------------
+        # TUTOR MODE
+        # -------------------------
         if mode == "tutor":
             answer = run_tutor_agent(user_input, context)
+
             print("\nTutor Agent Response:")
             print(answer)
 
+            # ✅ TELEMETRY HERE
+            log_event("tutor_response", {
+                "question": user_input,
+                "retrieved_chunks": docs,
+            })
+
+        # -------------------------
+        # QUIZ MODE (interactive)
+        # -------------------------
         if mode == "quiz":
             quiz_output = run_quiz_agent(user_input, context)
             question, expected_answer = parse_quiz_output(quiz_output)
@@ -65,6 +104,14 @@ def main():
 
             print("\nEvaluator Agent Feedback:")
             print(feedback)
+
+            # ✅ TELEMETRY HERE
+            log_event("quiz_evaluation", {
+                "topic": user_input,
+                "question": question,
+                "user_answer": user_answer,
+                "retrieved_chunks": docs,
+            })
 
 
 if __name__ == "__main__":
