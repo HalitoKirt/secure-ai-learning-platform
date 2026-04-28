@@ -1,8 +1,10 @@
-import ollama
 from app.rag.rag import load_documents, query_docs
+from app.agents.tutor_agent import run_tutor_agent
+
 
 def main():
-    print("Secure AI Learning Platform with RAG")
+    print("Secure AI Learning Platform")
+    print("RAG + Tutor Agent enabled")
 
     load_documents()
 
@@ -10,28 +12,17 @@ def main():
         user_input = input("\nAsk a question or type 'exit': ")
 
         if user_input.lower() == "exit":
+            print("Goodbye.")
             break
 
         docs = query_docs(user_input)
-
         context = "\n".join(docs)
 
-        prompt = f"""
-Use the following context to answer the question:
+        answer = run_tutor_agent(user_input, context)
 
-{context}
+        print("\nTutor Agent Response:")
+        print(answer)
 
-Question:
-{user_input}
-"""
-
-        response = ollama.chat(
-            model="llama3.2:3b",
-            messages=[{"role": "user", "content": prompt}]
-        )
-
-        print("\nAI Response:")
-        print(response["message"]["content"])
 
 if __name__ == "__main__":
     main()
