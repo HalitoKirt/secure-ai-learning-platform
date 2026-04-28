@@ -7,7 +7,7 @@ MODEL_NAME = "llama3.2:3b"
 def run_quiz_agent(topic: str, context: str) -> str:
     """
     Quiz Agent:
-    Creates practice questions using retrieved RAG context.
+    Creates one practice question and one expected answer using retrieved RAG context.
     """
 
     prompt = f"""
@@ -15,19 +15,24 @@ You are the Quiz Agent for the Secure AI Learning Platform.
 
 Rules:
 - Use the provided context first.
-- Create 3 practice questions.
-- Include the correct answer after each question.
-- Keep explanations short and clear.
+- Create exactly ONE practice question.
+- Provide exactly ONE expected answer.
+- Keep the question clear.
+- Keep the expected answer concise.
 - Do not make up facts.
-- If the context is not enough, say so.
+- Use this exact format:
+
+QUESTION:
+<question here>
+
+EXPECTED_ANSWER:
+<expected answer here>
 
 Context:
 {context}
 
 Quiz Topic:
 {topic}
-
-Quiz Agent Output:
 """
 
     response = ollama.chat(
@@ -38,3 +43,19 @@ Quiz Agent Output:
     )
 
     return response["message"]["content"]
+
+
+def parse_quiz_output(quiz_output: str) -> tuple[str, str]:
+    """
+    Extract question and expected answer from Quiz Agent output.
+    """
+
+    question = ""
+    expected_answer = ""
+
+    if "QUESTION:" in quiz_output and "EXPECTED_ANSWER:" in quiz_output:
+        question_part = quiz_output.split("QUESTION:", 1)[1]
+        question = question_part.split("EXPECTED_ANSWER:", 1)[0].strip()
+        expected_answer = question_part.split("EXPECTED_ANSWER:", 1)[1].strip()
+
+    return question, expected_answer
