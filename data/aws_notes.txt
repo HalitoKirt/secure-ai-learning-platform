@@ -1,0 +1,4 @@
+AWS IAM allows you to manage users, roles, and permissions.
+Least privilege means giving only the permissions necessary.
+CloudTrail records API activity in your AWS account.
+AWS Config tracks configuration changes and compliance.
