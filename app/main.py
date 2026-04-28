@@ -1,4 +1,8 @@
-from app.agents.security_agent import run_security_agent
+from app.agents.security_agent import (
+    run_security_agent,
+    extract_risk_level,
+    should_block_request,
+)
 from app.telemetry import log_event
 from app.rag.rag import load_documents, query_docs
 from app.agents.tutor_agent import run_tutor_agent
@@ -53,6 +57,7 @@ def main():
         context = "\n".join(docs)
 
         security_review = run_security_agent(user_input, context)
+        risk_level = extract_risk_level(security_review)
 
         print("\nSecurity Agent Review:")
         print(security_review)
@@ -60,8 +65,22 @@ def main():
         log_event("security_review", {
             "mode": mode,
             "input": user_input,
+            "risk_level": risk_level,
             "review": security_review,
         })
+
+        if should_block_request(risk_level):
+            print("\nRequest blocked by Security Agent due to High risk.")
+            log_event("blocked_request", {
+                "mode": mode,
+                "input": user_input,
+                "risk_level": risk_level,
+                "review": security_review,
+            })
+            continue
+
+        if risk_level == "Medium":
+            print("\nWarning: Security Agent marked this request as Medium risk. Proceeding with caution.")
 
         # -------------------------
         # TUTOR MODE

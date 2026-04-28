@@ -43,9 +43,35 @@ Retrieved Context:
 
     response = ollama.chat(
         model=MODEL_NAME,
-        messages=[
-            {"role": "user", "content": prompt}
-        ]
+        messages=[{"role": "user", "content": prompt}],
     )
 
     return response["message"]["content"]
+
+
+def extract_risk_level(security_review: str) -> str:
+    """
+    Extract Low, Medium, or High from the Security Agent review.
+    Defaults to Medium if the output cannot be parsed.
+    """
+
+    for line in security_review.splitlines():
+        if line.upper().startswith("RISK_LEVEL:"):
+            risk = line.split(":", 1)[1].strip().lower()
+
+            if "high" in risk:
+                return "High"
+            if "medium" in risk:
+                return "Medium"
+            if "low" in risk:
+                return "Low"
+
+    return "Medium"
+
+
+def should_block_request(risk_level: str) -> bool:
+    """
+    Block high-risk requests.
+    """
+
+    return risk_level == "High"
