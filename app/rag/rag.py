@@ -5,7 +5,7 @@ from sentence_transformers import SentenceTransformer
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
 # Create in-memory DB
-client = chromadb.Client()
+client = chromadb.PersistentClient(path="storage/chroma")
 collection = client.create_collection(name="aws_notes")
 
 def load_documents():
