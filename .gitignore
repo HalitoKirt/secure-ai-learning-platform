@@ -212,7 +212,10 @@ tempCodeRunnerFile.py
 # Marimo
 marimo/_static/
 marimo/_lsp/
-__marimo__/
+marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local vector database
+storage/ 
