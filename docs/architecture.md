@@ -2,38 +2,67 @@
 
 ## 1. Purpose
 
-The Secure AI Learning Platform is an offline-first AI system designed to support learning, knowledge retrieval, evaluation, and controlled tool use.
+The Secure AI Learning Platform is a hybrid, local-first AI security learning system designed to demonstrate secure AI architecture, RAG, multi-agent workflows, telemetry, evaluation, and future cloud integration.
 
-The platform is designed to demonstrate enterprise-style AI architecture with an emphasis on:
+The platform is built to show how AI systems can be:
 
-- privacy
-- security
-- observability
-- retrieval-augmented generation
-- controlled agent/tool behavior
-- future AWS infrastructure support
+- grounded in trusted knowledge
+- protected by security controls
+- evaluated for quality
+- logged for observability
+- designed for future AWS deployment
 
 ---
 
-## 2. High-Level Architecture
+## 2. Current Architecture
 
 ```text
 User
  │
  ▼
-Web / CLI / Voice Interface
+CLI Application
  │
  ▼
-Application Layer
+Request Router
  │
- ├── Offline LLM
+ ├── Tutor Mode
  │
- ├── RAG Pipeline
+ ├── Quiz Mode
  │
- ├── Multi-Agent Workflows
+ ├── Evaluate Mode
  │
- ├── MCP Server
+ └── PQC Mode
  │
- ├── Telemetry + Evals
+ ▼
+RAG Pipeline
  │
- └── Optional AWS Infrastructure
+ ├── AWS Security Notes
+ │
+ ├── Chunking
+ │
+ ├── Embeddings
+ │
+ └── ChromaDB Vector Store
+ │
+ ▼
+Security Agent
+ │
+ ├── Prompt risk review
+ │
+ ├── Risk classification
+ │
+ └── High-risk blocking
+ │
+ ▼
+Agent Workflow
+ │
+ ├── Tutor Agent
+ │
+ ├── Quiz Agent
+ │
+ ├── Evaluator Agent
+ │
+ └── PQC Agent
+ │
+ ▼
+Telemetry + Evaluation Logs
