@@ -100,9 +100,9 @@ def query_docs(query: str, n_results: int = 3) -> list[str]:
 
     documents = results.get("documents", [[]])[0]
 
-    print("\n--- Retrieved Context ---")
-    for index, doc in enumerate(documents, start=1):
-        print(f"[Chunk {index}] {doc[:300]}...")
-    print("--- End Retrieved Context ---\n")
+   # print("\n--- Retrieved Context ---")
+   # for index, doc in enumerate(documents, start=1):
+   #     print(f"[Chunk {index}] {doc[:300]}...")
+   # print("--- End Retrieved Context ---\n")
 
     return documents

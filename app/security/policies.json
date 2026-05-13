@@ -1,0 +1,42 @@
+{
+  "high_risk_patterns": [
+    "ignore.*previous.*instructions",
+    "ignore.*all.*previous.*instructions",
+    "reveal.*system.*prompt",
+    "show.*system.*prompt",
+    "print.*system.*prompt",
+    "disclose.*system.*prompt",
+    "override.*system.*instructions",
+    "bypass.*security",
+    "disable.*safety",
+    "act.*as.*developer",
+    "act.*as.*system",
+    "act.*as.*administrator",
+    "act.*as.*admin",
+    "pretend.*you.*are.*system",
+    "pretend.*you.*are.*developer",
+    "pretend.*you.*are.*administrator",
+    "roleplay.*as.*system",
+    "roleplay.*as.*developer",
+    "roleplay.*as.*administrator",
+    "developer.*mode",
+    "dan.*mode",
+    "you.*are.*now.*dan"
+  ],
+  "medium_risk_patterns": [
+    "ignore.*instructions",
+    "forget.*instructions",
+    "new.*instructions",
+    "jailbreak",
+    "roleplay.*as",
+    "pretend.*to.*be",
+    "simulate.*attack",
+    "simulate.*bypass",
+    "testing.*security"
+  ],
+  "policy_actions": {
+    "low": "allow",
+    "medium": "allow",
+    "high": "block"
+  }
+}

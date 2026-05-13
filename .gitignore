@@ -219,3 +219,9 @@ marimo__/
 
 # Local vector database
 storage/ 
+
+# logs
+telemetry/logs/
+
+# Application audit logs
+logs/
