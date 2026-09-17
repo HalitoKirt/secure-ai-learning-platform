@@ -1,7 +1,5 @@
-import ollama
+from app.llm.provider import chat
 
-
-MODEL_NAME = "llama3.2:3b"
 
 
 def run_security_agent(user_input: str, context: str) -> str:
@@ -41,12 +39,11 @@ Retrieved Context:
 {context}
 """
 
-    response = ollama.chat(
-        model=MODEL_NAME,
+    response = chat(
         messages=[{"role": "user", "content": prompt}],
     )
 
-    return response["message"]["content"]
+    return response
 
 
 def extract_risk_level(security_review: str) -> str:

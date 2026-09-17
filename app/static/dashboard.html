@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Secure AI Platform SOC Console</title>
+  <link rel="stylesheet" href="/static/dashboard.css" />
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <p class="badge">Live AWS Secure AI Demo</p>
+      <h1>Secure AI Platform SOC Console</h1>
+      <p>
+        A recruiter-friendly security operations dashboard for a FastAPI AI platform with
+        RAG, prompt-injection detection, output guardrails, telemetry, Docker, Terraform,
+        and AWS ECS/Fargate deployment.
+      </p>
+
+      <div class="hero-actions">
+        <a href="/docs" target="_blank">Open API Docs</a>
+        <a href="/health" target="_blank">Check Health</a>
+      </div>
+    </section>
+
+    <section class="grid">
+      <article class="card status-card">
+        <h2>Platform Status</h2>
+        <div class="status-row">
+          <span class="status-dot"></span>
+          <strong>Operational</strong>
+        </div>
+        <p>FastAPI service is reachable through the application load balancer.</p>
+      </article>
+
+      <article class="card">
+        <h2>Security Controls</h2>
+        <ul>
+          <li>API key authentication</li>
+          <li>Rate limiting</li>
+          <li>Prompt injection detection</li>
+          <li>RAG context inspection</li>
+          <li>Output safety filtering</li>
+          <li>JSON audit telemetry</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>Cloud Architecture</h2>
+        <ul>
+          <li>FastAPI application</li>
+          <li>Docker container</li>
+          <li>Amazon ECR image repository</li>
+          <li>ECS/Fargate service</li>
+          <li>Application Load Balancer</li>
+          <li>Terraform infrastructure</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="card">
+      <div class="section-header">
+        <div>
+          <h2>Interactive Secure AI Demo</h2>
+          <p>Run a restricted recruiter demo through the same security pipeline.</p>
+        </div>
+      </div>
+
+      <form id="demoForm" class="demo-form">
+        <label for="mode">Mode</label>
+        <select id="mode" name="mode">
+          <option value="tutor">Tutor</option>
+          <option value="quiz">Quiz</option>
+          <option value="security">Security Review</option>
+          <option value="pqc">PQC Risk Review</option>
+        </select>
+
+        <label for="question">Prompt</label>
+        <textarea id="question" name="question" rows="5">What does CloudTrail record?</textarea>
+
+        <button type="submit">Run Secure AI Demo</button>
+      </form>
+
+      <div id="demoStatus" class="summary"></div>
+      <pre id="demoResponse" class="response-box"></pre>
+    </section>    
+
+    <section class="card">
+      <div class="section-header">
+        <div>
+          <h2>SOC Telemetry Feed</h2>
+          <p>Telemetry generated from demo activity.</p>
+        </div>
+      </div>
+
+      <div id="eventSummary" class="summary"></div>
+      <div id="events" class="events"></div>
+    </section>
+  </main>
+
+  <script src="/static/dashboard.js"></script>
+</body>
+</html>

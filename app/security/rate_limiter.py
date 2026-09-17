@@ -1,23 +1,55 @@
 import os
 import time
-from fastapi import Request, HTTPException
+
+from fastapi import HTTPException, Request
 
 from app.telemetry.logger import log_event
 
-RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "60"))
-RATE_LIMIT_MAX_REQUESTS = int(os.getenv("RATE_LIMIT_MAX_REQUESTS", "5"))
+
+RATE_LIMIT_WINDOW_SECONDS = int(
+    os.getenv("RATE_LIMIT_WINDOW_SECONDS", "60")
+)
+RATE_LIMIT_MAX_REQUESTS = int(
+    os.getenv("RATE_LIMIT_MAX_REQUESTS", "5")
+)
 
 request_history = {}
 
 
+def get_client_ip(request: Request) -> str:
+    """
+    Resolve the originating client address.
+
+    AWS Application Load Balancer appends the client address to
+    X-Forwarded-For. The first value represents the originating client.
+    Local requests fall back to the direct connection address.
+
+    The AWS deployment restricts direct ECS ingress to the ALB security
+    group, which provides the proxy trust boundary for the deployed app.
+    """
+    forwarded_for = request.headers.get("x-forwarded-for")
+
+    if forwarded_for:
+        client_ip = forwarded_for.split(",", 1)[0].strip()
+
+        if client_ip:
+            return client_ip
+
+    if request.client:
+        return request.client.host
+
+    return "unknown"
+
+
 def enforce_rate_limit(request: Request):
-    client_ip = request.client.host if request.client else "unknown"
+    client_ip = get_client_ip(request)
     now = time.time()
 
     timestamps = request_history.get(client_ip, [])
 
     timestamps = [
-        timestamp for timestamp in timestamps
+        timestamp
+        for timestamp in timestamps
         if now - timestamp < RATE_LIMIT_WINDOW_SECONDS
     ]
 

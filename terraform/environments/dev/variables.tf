@@ -33,3 +33,8 @@ variable "log_retention_days" {
   type        = number
   default     = 14
 }
+
+variable "container_image" {
+  description = "Container image URI for the FastAPI application"
+  type        = string
+}

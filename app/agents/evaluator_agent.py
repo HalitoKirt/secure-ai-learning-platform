@@ -1,7 +1,5 @@
-import ollama
+from app.llm.provider import chat
 
-
-MODEL_NAME = "llama3.2:3b"
 
 
 def run_evaluator_agent(question: str, expected_answer: str, user_answer: str) -> str:
@@ -33,11 +31,10 @@ User Answer:
 Evaluator Agent Feedback:
 """
 
-    response = ollama.chat(
-        model=MODEL_NAME,
+    response = chat(
         messages=[
             {"role": "user", "content": prompt}
         ]
     )
 
-    return response["message"]["content"]
+    return response
