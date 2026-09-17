@@ -1,0 +1,40 @@
+# Version control
+.git
+.github
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# Python
+venv
+.venv
+__pycache__
+*.py[cod]
+.pytest_cache
+.mypy_cache
+.ruff_cache
+
+# Terraform local/state artifacts
+.terraform
+**/.terraform
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+!*.tfvars.example
+
+# Runtime/generated data
+logs
+*.log
+
+# Editor/OS files
+.vscode
+.idea
+.DS_Store
+
+# Local backup/temp files
+*.bak
+*.tmp
+*~
