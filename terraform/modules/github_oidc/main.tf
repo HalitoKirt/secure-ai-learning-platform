@@ -71,6 +71,7 @@ data "aws_iam_policy_document" "github_deploy" {
     effect = "Allow"
 
     actions = [
+      "ecs:DescribeServices",
       "ecs:UpdateService"
     ]
 
