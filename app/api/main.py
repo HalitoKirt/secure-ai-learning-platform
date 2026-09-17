@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends, Request
+from fastapi import FastAPI, HTTPException, Depends, Request, Query
 from pydantic import BaseModel
 import uuid
 import time
@@ -50,7 +50,9 @@ def dashboard():
 
 
 @app.get("/api/telemetry/recent")
-def recent_telemetry(limit: int = 20):
+def recent_telemetry(
+    limit: int = Query(default=20, ge=1, le=100)
+):
     if not TELEMETRY_LOG_PATH.exists():
         return {"events": []}
 
@@ -70,12 +72,12 @@ def health():
     return {"status": "ok"}
 
 
-@app.post("/ask")
-def ask(
+def _process_ask(
     request: AskRequest,
     http_request: Request,
-    _: str = Depends(validate_api_key)
+    endpoint: str
 ):
+    """Run the shared guarded AI request-processing pipeline."""
     enforce_rate_limit(http_request)
 
     mode = request.mode.lower().strip()
@@ -89,7 +91,7 @@ def ask(
         "trace_id": trace_id,
         "span_id": request_span_id,
         "component": "api",
-        "endpoint": "/ask",
+        "endpoint": endpoint,
         "mode": mode,
         "status": "received"
     })
@@ -102,7 +104,7 @@ def ask(
             "trace_id": trace_id,
             "span_id": create_span_id("security-inspection"),
             "component": "security",
-            "endpoint": "/ask",
+            "endpoint": endpoint,
             "mode": mode,
             "is_suspicious": security_detection["is_suspicious"],
             "risk_level": security_detection["risk_level"],
@@ -119,7 +121,7 @@ def ask(
             "trace_id": trace_id,
             "span_id": create_span_id("policy-action"),
             "component": "policy",
-            "endpoint": "/ask",
+            "endpoint": endpoint,
             "mode": mode,
             "risk_level": security_detection["risk_level"],
             "risk_score": security_detection["risk_score"],
@@ -136,7 +138,7 @@ def ask(
                 "trace_id": trace_id,
                 "span_id": create_span_id("request-blocked"),
                 "component": "security",
-                "endpoint": "/ask",
+                "endpoint": endpoint,
                 "mode": mode,
                 "status": "blocked",
                 "reason": "high_risk_prompt_injection",
@@ -155,7 +157,7 @@ def ask(
             "trace_id": trace_id,
             "span_id": create_span_id("rag-query"),
             "component": "rag",
-            "endpoint": "/ask",
+            "endpoint": endpoint,
             "mode": mode,
             "chunks_retrieved": len(retrieved_chunks)
         })
@@ -167,7 +169,7 @@ def ask(
             "trace_id": trace_id,
             "span_id": create_span_id("context-inspection"),
             "component": "context_guardrail",
-            "endpoint": "/ask",
+            "endpoint": endpoint,
             "mode": mode,
             "risk_level": context_review["risk_level"],
             "action": context_review["action"],
@@ -183,7 +185,7 @@ def ask(
                 "trace_id": trace_id,
                 "span_id": create_span_id("context-blocked"),
                 "component": "context_guardrail",
-                "endpoint": "/ask",
+                "endpoint": endpoint,
                 "mode": mode,
                 "status": "blocked",
                 "reason": context_review["reason"],
@@ -207,7 +209,7 @@ def ask(
                 "trace_id": trace_id,
                 "span_id": create_span_id("tutor-agent-selected"),
                 "component": "agent",
-                "endpoint": "/ask",
+                "endpoint": endpoint,
                 "agent": agent_name,
                 "mode": mode
             })
@@ -225,7 +227,7 @@ def ask(
                 "trace_id": trace_id,
                 "span_id": create_span_id("quiz-agent-selected"),
                 "component": "agent",
-                "endpoint": "/ask",
+                "endpoint": endpoint,
                 "agent": agent_name,
                 "mode": mode
             })
@@ -243,7 +245,7 @@ def ask(
                 "trace_id": trace_id,
                 "span_id": create_span_id("security-agent-selected"),
                 "component": "agent",
-                "endpoint": "/ask",
+                "endpoint": endpoint,
                 "agent": agent_name,
                 "mode": mode
             })
@@ -261,7 +263,7 @@ def ask(
                 "trace_id": trace_id,
                 "span_id": create_span_id("pqc-agent-selected"),
                 "component": "agent",
-                "endpoint": "/ask",
+                "endpoint": endpoint,
                 "agent": agent_name,
                 "mode": mode
             })
@@ -278,7 +280,7 @@ def ask(
                 "trace_id": trace_id,
                 "span_id": create_span_id("evaluator-agent-selected"),
                 "component": "agent",
-                "endpoint": "/ask",
+                "endpoint": endpoint,
                 "agent": agent_name,
                 "mode": mode
             })
@@ -308,7 +310,7 @@ def ask(
             "trace_id": trace_id,
             "span_id": create_span_id("output-inspection"),
             "component": "output_guardrail",
-            "endpoint": "/ask",
+            "endpoint": endpoint,
             "mode": mode,
             "risk_level": output_review["risk_level"],
             "action": output_review["action"],
@@ -322,7 +324,7 @@ def ask(
                 "trace_id": trace_id,
                 "span_id": create_span_id("response-blocked"),
                 "component": "output_guardrail",
-                "endpoint": "/ask",
+                "endpoint": endpoint,
                 "mode": mode,
                 "status": "blocked",
                 "reason": output_review["reason"],
@@ -341,7 +343,7 @@ def ask(
             "trace_id": trace_id,
             "span_id": create_span_id(f"{agent_name}-agent-completed"),
             "component": "agent",
-            "endpoint": "/ask",
+            "endpoint": endpoint,
             "agent": agent_name,
             "mode": mode,
             "status": "success",
@@ -355,7 +357,7 @@ def ask(
             "trace_id": trace_id,
             "span_id": create_span_id("request-completed"),
             "component": "api",
-            "endpoint": "/ask",
+            "endpoint": endpoint,
             "mode": mode,
             "status": "success",
             "duration_ms": total_duration_ms
@@ -373,7 +375,7 @@ def ask(
             "trace_id": trace_id,
             "span_id": create_span_id("request-failed"),
             "component": "api",
-            "endpoint": "/ask",
+            "endpoint": endpoint,
             "mode": mode,
             "status": "client_error",
             "error_type": type(e).__name__,
@@ -387,7 +389,7 @@ def ask(
             "trace_id": trace_id,
             "span_id": create_span_id("request-failed"),
             "component": "api",
-            "endpoint": "/ask",
+            "endpoint": endpoint,
             "mode": mode,
             "status": "server_error",
             "error_type": type(e).__name__,
@@ -399,16 +401,29 @@ def ask(
             detail="Internal server error"
         )
     
+@app.post("/ask")
+def ask(
+    request: AskRequest,
+    http_request: Request,
+    _: str = Depends(validate_api_key)
+):
+    """Authenticated API endpoint."""
+    return _process_ask(
+        request=request,
+        http_request=http_request,
+        endpoint="/ask"
+    )
+
+
 @app.post("/demo/ask")
 def demo_ask(request: AskRequest, http_request: Request):
     """
-    Recruiter-friendly demo endpoint.
+    Public recruiter-facing demo endpoint.
 
-    This endpoint intentionally does not require an API key,
-    but it still keeps rate limiting, prompt-injection detection,
-    RAG context inspection, output filtering, and telemetry.
+    Authentication is intentionally not required here. The demo retains
+    rate limiting, prompt-injection detection, RAG context inspection,
+    output filtering, and telemetry, while restricting available modes.
     """
-
     allowed_demo_modes = {"tutor", "quiz", "security", "pqc"}
     mode = request.mode.lower().strip()
 
@@ -418,4 +433,8 @@ def demo_ask(request: AskRequest, http_request: Request):
             detail="Demo mode only supports tutor, quiz, security, and pqc."
         )
 
-    return ask(request=request, http_request=http_request, _="demo")    
+    return _process_ask(
+        request=request,
+        http_request=http_request,
+        endpoint="/demo/ask"
+    )
