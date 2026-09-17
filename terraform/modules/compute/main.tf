@@ -102,10 +102,13 @@ resource "aws_ecs_task_definition" "app" {
         {
           name  = "BEDROCK_MODEL_ID"
           value = "us.amazon.nova-lite-v1:0"
-        },
+        }
+      ]
+
+      secrets = [
         {
-          name  = "SECURE_API_KEY"
-          value = "dev-secret-key"
+          name      = "SECURE_API_KEY"
+          valueFrom = aws_secretsmanager_secret.api_key.arn
         }
       ]
 
@@ -169,4 +172,30 @@ resource "aws_ecs_service" "app" {
     Name        = "${var.project_name}-${var.environment}-service"
     Environment = var.environment
   }
+}
+
+resource "aws_secretsmanager_secret" "api_key" {
+  name        = "${var.project_name}/${var.environment}/secure-api-key"
+  description = "API authentication key for the Secure AI Platform"
+
+  tags = {
+    Name        = "${var.project_name}-${var.environment}-secure-api-key"
+    Environment = var.environment
+  }
+}
+
+resource "aws_iam_role_policy" "task_execution_secret_access" {
+  name = "${var.project_name}-${var.environment}-secret-access"
+  role = aws_iam_role.task_execution.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["secretsmanager:GetSecretValue"]
+        Resource = aws_secretsmanager_secret.api_key.arn
+      }
+    ]
+  })
 }
