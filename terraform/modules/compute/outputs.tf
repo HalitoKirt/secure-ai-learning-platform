@@ -27,3 +27,8 @@ output "service_id" {
   description = "ECS service ID"
   value       = aws_ecs_service.app.id
 }
+
+output "api_key_secret_arn" {
+  description = "ARN of the Secrets Manager secret used for API authentication"
+  value       = aws_secretsmanager_secret.api_key.arn
+}

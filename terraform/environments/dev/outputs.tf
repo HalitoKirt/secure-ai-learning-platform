@@ -32,3 +32,8 @@ output "ecs_service_name" {
   description = "ECS service name."
   value       = module.compute.service_name
 }
+
+output "api_key_secret_arn" {
+  description = "ARN of the Secrets Manager secret used for API authentication."
+  value       = module.compute.api_key_secret_arn
+}
