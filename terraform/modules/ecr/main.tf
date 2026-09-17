@@ -11,3 +11,42 @@ resource "aws_ecr_repository" "app" {
     Environment = var.environment
   }
 }
+
+resource "aws_ecr_lifecycle_policy" "app" {
+  repository = aws_ecr_repository.app.name
+
+  policy = jsonencode({
+    rules = [
+      {
+        rulePriority = 1
+        description  = "Keep only the last 15 tagged images"
+
+        selection = {
+          tagStatus      = "tagged"
+          tagPatternList = ["*"]
+          countType      = "imageCountMoreThan"
+          countNumber    = 15
+        }
+
+        action = {
+          type = "expire"
+        }
+      },
+      {
+        rulePriority = 2
+        description  = "Expire untagged images after 14 days"
+
+        selection = {
+          tagStatus   = "untagged"
+          countType   = "sinceImagePushed"
+          countUnit   = "days"
+          countNumber = 14
+        }
+
+        action = {
+          type = "expire"
+        }
+      }
+    ]
+  })
+}

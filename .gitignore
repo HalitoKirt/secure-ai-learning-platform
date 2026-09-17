@@ -233,3 +233,10 @@ logs/
 crash.log
 crash.*.log
 *.tfvars.local
+
+# Terraform environment configuration
+*.tfvars
+!*.tfvars.example
+
+# Terraform plan files
+*.tfplan
