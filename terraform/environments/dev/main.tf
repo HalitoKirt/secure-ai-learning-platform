@@ -73,3 +73,13 @@ module "compute" {
   target_group_arn      = module.load_balancer.target_group_arn
   desired_count         = 1
 }
+
+module "github_oidc" {
+  source = "../../modules/github_oidc"
+
+  project_name       = var.project_name
+  environment        = var.environment
+  github_repository  = "HalitoKirt/secure-ai-learning-platform"
+  ecr_repository_arn = module.ecr.repository_arn
+  ecs_service_arn    = module.compute.service_arn
+}

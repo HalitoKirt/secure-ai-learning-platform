@@ -37,3 +37,8 @@ output "api_key_secret_arn" {
   description = "ARN of the Secrets Manager secret used for API authentication."
   value       = module.compute.api_key_secret_arn
 }
+
+output "github_deploy_role_arn" {
+  description = "IAM role ARN used by GitHub Actions for OIDC deployment."
+  value       = module.github_oidc.role_arn
+}
